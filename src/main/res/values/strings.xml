@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="sort_setting">Sort by Popularity</string>
+    <string name="error_message">An error has occurred please check your internet connection and try again</string>
+
+    <string name="movie_api_key">75ef3e3f981c99f38c53ee707338e8ac</string>
+
+
+</resources>
