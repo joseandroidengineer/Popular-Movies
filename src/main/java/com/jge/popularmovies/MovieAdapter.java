@@ -64,7 +64,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Movie movie = movies.get(i);
         movieAdapterViewHolder.movieTitleTextView.setText(movie.getTitle());
         Picasso.with(movieAdapterViewHolder.moviePosterImageView.getContext())
-                .load(NetworkUtils.buildImageUrl(movie.getImagePath()))
+                .load(NetworkUtils.buildImageUrl(movie.getPosterImagePath()))
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
                 .into(movieAdapterViewHolder.moviePosterImageView);

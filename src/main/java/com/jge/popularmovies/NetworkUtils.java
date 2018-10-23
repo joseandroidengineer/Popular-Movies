@@ -26,19 +26,24 @@ public class NetworkUtils {
     private static final String BASE_URL = "https://api.themoviedb.org/";
     private static final String NUM_PARAM = "3/";
     private static final String TRENDING_PATH = "trending/";
-    private static final String MEDIA_TYPE_PATH = "movie/";
-    private static final String TIME_WINDOW_PATH = "week";
+    private static final String TIME_WINDOW_PATH = "discover/";
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/";
     private static final String SIZE_IMAGE_PATH ="w500";
+
+    private static final String DISCOVER_PATH = "discover/";
+    private static final String MEDIA_TYPE_PATH = "movie";
+    private static final String SORT_BY_PARAM = "sort_by";
+    private static final String POPULARITY_QUERY = "popularity.desc";
+    private static final String RATING_QUERY = "vote_average.desc";
 
 
 
     public static URL buildBaseUrl(String key) {
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                 .appendEncodedPath(NUM_PARAM)
-                .appendEncodedPath(TRENDING_PATH)
+                .appendEncodedPath(DISCOVER_PATH)
                 .appendEncodedPath(MEDIA_TYPE_PATH)
-                .appendEncodedPath(TIME_WINDOW_PATH)
+                .appendQueryParameter(SORT_BY_PARAM,POPULARITY_QUERY)
                 .appendQueryParameter(API_KEY,key)
                 .build();
 
@@ -49,7 +54,7 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built URI " + url);
+        Log.e("URL", builtUri.toString());
 
         return url;
     }
@@ -63,41 +68,6 @@ public class NetworkUtils {
         Log.v(TAG, "Built IMAGE URI " + builtUri);
 
         return builtUri;
-    }
-    static OkHttpClient client = new OkHttpClient();
-
-    @Nullable
-    public static JSONObject run(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            return new JSONObject(response.body().toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static JSONObject getResponseFromHttpUrl(URL url) throws IOException, JSONException {
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        try {
-            InputStream in = urlConnection.getInputStream();
-
-            Scanner scanner = new Scanner(in);
-            JSONObject jsonObject = new JSONObject(scanner.toString());
-            scanner.useDelimiter("\\A");
-
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return jsonObject;
-            } else {
-                return null;
-            }
-        } finally {
-            urlConnection.disconnect();
-        }
     }
 
 }

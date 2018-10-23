@@ -3,6 +3,7 @@ package com.jge.popularmovies;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -51,9 +52,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mRecyclerView = findViewById(R.id.recyclerview_list_of_movies);
         mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
 
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         mRecyclerView.setHasFixedSize(true);
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -71,16 +70,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void showMovieDataView() {
-        /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMessage() {
-        /* First, hide the currently visible data */
         mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
@@ -142,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //TODO Once Main Activity is finished replace toast with a sort to sort items in a list.
         int id = item.getItemId();
         if(id == R.id.sort){
             Toast.makeText(this,"Replace Toast with sort of movies by Popularity", Toast.LENGTH_SHORT).show();
@@ -155,7 +149,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("title",movieNameIndexClicked.getTitle());
         intent.putExtra("overview", movieNameIndexClicked.getDescription());
-        intent.putExtra("imgUrl", movieNameIndexClicked.getImagePath());
+        intent.putExtra("imgUrl", movieNameIndexClicked.getPosterImagePath());
+        intent.putExtra("rating",movieNameIndexClicked.getVoteAverage());
+        intent.putExtra("release",movieNameIndexClicked.getReleaseDate());
         startActivity(intent);
 
     }
