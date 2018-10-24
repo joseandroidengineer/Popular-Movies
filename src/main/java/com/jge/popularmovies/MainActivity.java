@@ -37,11 +37,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
     private JSONObject mJSONObjectResponse;
-    private JSONArray jsonArray;
     private String error;
     private Gson gson;
     private List<Movie> movies;
     private RequestQueue queue;
+    private static final String POPULARITY_PATH = "popular";
+    private static final String RATING_PATH = "top_rated";
 
 
     @Override
@@ -51,14 +52,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         mRecyclerView = findViewById(R.id.recyclerview_list_of_movies);
         mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator.setVisibility(View.VISIBLE);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         mRecyclerView.setHasFixedSize(true);
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
-        volleyRequest();
+        volleyRequest(POPULARITY_PATH);
 
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         loadMovieData();
         mMovieAdapter.notifyDataSetChanged();
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void gsonMap(JSONArray jsonArray) {
-        String volleyError = error;
         if(mJSONObjectResponse == null){
             showErrorMessage();
         }else{
@@ -92,11 +93,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
             }
         }
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
 
-    private void volleyRequest(){
+    private void volleyRequest(String path){
         queue = Volley.newRequestQueue(getBaseContext());
-        String url = String.valueOf(NetworkUtils.buildBaseUrl(getString(R.string.movie_api_key)));
+        String url = String.valueOf(NetworkUtils.buildBaseUrl(getString(R.string.movie_api_key), path));
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -104,14 +106,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                     public void onResponse(JSONObject response) {
                         mJSONObjectResponse = response;
                         try {
-                            jsonArray = new JSONArray(response.getJSONArray("results"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            try {
-                                gsonMap(response.getJSONArray("results"));
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
+                            gsonMap(response.getJSONArray("results"));
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -124,8 +121,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                     }
                 });
         queue.add(jsonObjectRequest);
-
-
     }
 
     @Override
@@ -138,8 +133,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.sort){
-            Toast.makeText(this,"Replace Toast with sort of movies by Popularity", Toast.LENGTH_SHORT).show();
+        if(id == R.id.sort_popular){
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+            mMovieAdapter.setMovieData(null);
+            volleyRequest(POPULARITY_PATH);
+        }else if(id == R.id.sort_topRated){
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+            mMovieAdapter.setMovieData(null);
+            volleyRequest(RATING_PATH);
+
         }
         return super.onOptionsItemSelected(item);
     }
